@@ -15,11 +15,18 @@ RUN true \
     && apk add --update-cache dante-server openvpn bash openresolv openrc \
     && rm -rf /var/cache/apk/* \
     && chmod a+x /usr/local/bin/sockd.sh \
+# Add a user   && adduser test -D \
+# Add password method 1    && echo test:superpassword | chpasswd \
+# Add password method 2   && echo "superpassword" | passwd test --stdin \
     && true
 
 COPY sockd.conf /etc/
 
+WORKDIR /etc/openvpn
+
 ENTRYPOINT [ \
-    "/bin/bash", "-c", \
-    "cd /etc/openvpn && /usr/sbin/openvpn --config *.conf --script-security 2 --up /usr/local/bin/sockd.sh" \
+    "/usr/sbin/openvpn",\
+    "--config", "config.ovpn",\
+    "--script-security", "2",\
+    "--up", "/usr/local/bin/sockd.sh"\
     ]
